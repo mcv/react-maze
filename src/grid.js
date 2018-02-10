@@ -1,6 +1,24 @@
 import React from 'react';
 import ActionButtons from './actionButtons.js';
 
+
+class UniquePoint {
+    setPoint = field => {
+        console.log("old field: ",this.field);
+        if (this.field) {
+            this.field.content = null;
+        }
+        this.field = field;
+        this.coords = field.coords;
+    };
+}
+class StartPoint extends UniquePoint {
+    label = "Start";
+}
+class EndPoint extends UniquePoint {
+    label = "End";
+}
+
 export default class Grid extends React.Component {
     constructor(props) {
         super(props);
@@ -11,6 +29,8 @@ export default class Grid extends React.Component {
             msg: "",
             actionCallback: ()=>{}
         };
+        this.startpoint = new StartPoint();
+        this.endpoint = new EndPoint();
     }
 
     changeX = event => {
@@ -41,7 +61,7 @@ export default class Grid extends React.Component {
 
         let rows = [];
         for (var y=0; y<this.state.y; y++) {
-            rows.push(<Row key={y} columnsAmount={this.state.x} action={this.state.actionCallback}/>);
+            rows.push(<Row key={y} y={y} columnsAmount={this.state.x} action={this.state.actionCallback}/>);
         }
 
         return (
@@ -64,8 +84,9 @@ export default class Grid extends React.Component {
 class Row extends React.Component {
     render() {
         let fields = [];
+        let y = this.props.y;
         for (var x=0; x<this.props.columnsAmount; x++) {
-            fields.push(<Field key={x.toString()+'-'+this.props.y} action={this.props.action}/>)
+            fields.push(<Field key={x.toString()+'-'+y.toString()} coords={[x,y]} action={this.props.action}/>)
         }
         return (
             <div id={this.props.id} className="board-row">
@@ -77,10 +98,23 @@ class Row extends React.Component {
 }
 
 class Field extends React.Component {
+    constructor(props) {
+        super(props);
+        this.coords = [this.x, this.y] = this.props.coords;
+        this.state = {
+            content: null
+        };
+    }
+    setContent(content) {
+        this.setState({content: content});
+    }
+    label() {
+        return this.state.content? this.state.content.label: "";
+    }
     render() {
         return (
             <button className="square" onClick={event => this.props.action(event, this)}>
-                {/* TODO */}
+                {this.label()}
             </button>
         );
     }

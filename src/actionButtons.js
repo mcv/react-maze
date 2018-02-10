@@ -7,17 +7,19 @@ export default class ActionButtons extends React.Component {
 
         return (
             <div>
-                <Action     setMsg={grid.setMsg} action={grid.clear}        title="Clear all" msg="Grid cleared" />
-                <Clear      setMsg={grid.setMsg} setAction={grid.setAction} title="Clear"     msg="Select field to clear"/>
-                <Boulder    setMsg={grid.setMsg} setAction={grid.setAction} title="Boulder"   msg="Place boulder"/>
-                <Gravel     setMsg={grid.setMsg} setAction={grid.setAction} title="Gravel"    msg="Place gravel"/>
-                <Wormhole   setMsg={grid.setMsg} setAction={grid.setAction} title="Wormhole"  msg="Place wormhole entrance"/>
-                <Action       setMsg={grid.setMsg} action={grid.play}       title="Play"      msg="Solving maze..."/>
+                <ActionButton     setMsg={grid.setMsg} action={grid.clear}        title="Clear all" msg="Grid cleared" />
+                <ClearButton      setMsg={grid.setMsg} setAction={grid.setAction} title="Clear"     msg="Select field to clear"/>
+                <StartButton      setMsg={grid.setMsg} setAction={grid.setAction} title="Begin"     msg="Place start point" item={grid.startpoint}/>
+                <EndButton        setMsg={grid.setMsg} setAction={grid.setAction} title="End"       msg="Place end point"   item={grid.endpoint}/>
+                <BoulderButton    setMsg={grid.setMsg} setAction={grid.setAction} title="Boulder"   msg="Place boulder"/>
+                <GravelButton     setMsg={grid.setMsg} setAction={grid.setAction} title="Gravel"    msg="Place gravel"/>
+                <WormholeButton   setMsg={grid.setMsg} setAction={grid.setAction} title="Wormhole"  msg="Place wormhole entrance"/>
+                <ActionButton     setMsg={grid.setMsg} action={grid.play}         title="Play"      msg="Solving maze..."/>
             </div>
         );
     }
 }
-class Action extends React.Component {
+class ActionButton extends React.Component {
     constructor(props) {
         super(props);
         this.title = this.props.title;
@@ -25,7 +27,12 @@ class Action extends React.Component {
     }
     onClick = () => {
         this.props.setMsg(this.msg);
-        this.props.action();
+        if (this.props.action) {
+            this.props.action();
+        }
+        else {
+            this.action();
+        }
     };
     render() {
         return (
@@ -36,68 +43,93 @@ class Action extends React.Component {
     }
 }
 
-class Clear extends React.Component {
+class ClearButton extends ActionButton {
+    action = () => {
+        this.props.setAction((event, field) => {
+            console.log("TODO: clear field")
+        });
+    };
+}
+class StartButton extends ActionButton {
     constructor(props) {
         super(props);
-        this.title = Clear;
+        this.startpoint = props.item;
     }
-    onClick = () => {
-        this.props.setMsg("Select field to clear");
+    action = () => {
         this.props.setAction((event, field) => {
+            console.log("place startpoint on ",field);
+            this.startpoint.setPoint(field);
+            field.setContent(this.startpoint);
         });
     };
-    render() {
-        return (
-            <button className="square" onClick={this.onClick}>
-                Clear
-            </button>
-        );
-    }
 }
-class Boulder extends Action {
-    onClick = () => {
-        this.props.setMsg("Place boulder");
+class EndButton extends ActionButton {
+    constructor(props) {
+        super(props);
+        this.endpoint = props.item;
+    }
+    action = () => {
+        this.props.setAction((event, field) => {
+            console.log("place endpoint on ",field);
+            this.endpoint.setPoint(field);
+            field.setContent(this.endpoint);
+        });
+    };
+}
+class Boulder {
+    constructor(coords) {
+        this.coords = coords;
+    }
+    label = "B";
+}
+class BoulderButton extends ActionButton {
+    action = () => {
         this.props.setAction((event, field) => {
             console.log("place boulder on ",field);
+            field.setContent(new Boulder(field.coords));
         });
     };
-    render() {
-        return (
-            <button className="square" onClick={this.onClick}>
-                Boulder
-            </button>
-        );
-    }
 }
-class Gravel extends React.Component {
-    onClick = () => {
+class Gravel {
+    constructor(coords) {
+        this.coords = coords;
+    }
+    label = "G";
+}
+class GravelButton extends ActionButton {
+    action = () => {
         this.props.setMsg("Place gravel");
         this.props.setAction((event, field) => {
             console.log("place gravel on ",field);
+            field.setContent(new Gravel(field.coords));
         });
     };
-    render() {
-        return (
-            <button className="square" onClick={this.onClick}>
-                Gravel
-            </button>
-        );
-    }
-
 }
-class Wormhole extends React.Component {
-    onClick = () => {
-        this.props.setMsg("Place wormhole");
-        this.props.setAction((event, field) => {
-            console.log("place wormhole on ",field);
-        });
-    };
-    render() {
-        return (
-            <button className="square" onClick={this.onClick}>
-                Wormhole
-            </button>
-        );
+class Wormhole {
+    constructor(coords) {
+        this.entrance = coords;
     }
+    label = "W";
+    setExit(coords) {
+        this.ext = coords;
+    }
+}
+class WormholeButton extends ActionButton {
+    select = (event, entranceField) => {
+        console.log("place wormhole entrance on ",entranceField);
+        let wormhole = new Wormhole(entranceField.coords);
+        entranceField.setContent(wormhole);
+        this.props.setMsg("Place wormhole exit");
+        this.props.setAction((event, exitField) => {
+            console.log("place wormhole exit on ",exitField);
+            this.props.setMsg(this.props.msg);
+            this.props.setAction(this.select);
+            wormhole.setExit(exitField.coords);
+            exitField.setContent(wormhole);
+        })
+    };
+    action = () => {
+        this.props.setAction(this.select);
+    };
 
 }
