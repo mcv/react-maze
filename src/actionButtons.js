@@ -1,5 +1,5 @@
 import React from 'react';
-import {StartPoint, EndPoint, Boulder, Gravel, WormholeEntrance, WormholeExit} from './obstacles';
+import {Boulder, Gravel, WormholeEntrance, WormholeExit} from './board.js';
 
 export default class ActionButtons extends React.Component {
 
@@ -10,13 +10,13 @@ export default class ActionButtons extends React.Component {
             <div>
                 <ActionButton     setMsg={grid.setMsg} action={grid.clear}        title="Clear all" msg="Grid cleared" />
                 <ClearButton      setMsg={grid.setMsg} setAction={grid.setAction} title="Clear"     msg="Select field to clear"/>
-                <StartButton      setMsg={grid.setMsg} setAction={grid.setAction} title="Begin"     msg="Place start point" item={grid.startpoint}/>
-                <EndButton        setMsg={grid.setMsg} setAction={grid.setAction} title="End"       msg="Place end point"   item={grid.endpoint}/>
+                <StartButton      setMsg={grid.setMsg} setAction={grid.setAction} title="Begin"     msg="Place start point" item={grid.board.startpoint}/>
+                <EndButton        setMsg={grid.setMsg} setAction={grid.setAction} title="End"       msg="Place end point"   item={grid.board.endpoint}/>
                 <BoulderButton    setMsg={grid.setMsg} setAction={grid.setAction} title="Boulder"   msg="Place boulder"/>
                 <GravelButton     setMsg={grid.setMsg} setAction={grid.setAction} title="Gravel"    msg="Place gravel"/>
                 <WormholeEntranceButton   setMsg={grid.setMsg} setAction={grid.setAction} title="Entrance"  msg="Place wormhole entrance"/>
                 <WormholeExitButton   setMsg={grid.setMsg} setAction={grid.setAction} title="Exit"  msg="Place wormhole exit"/>
-                <ActionButton     setMsg={grid.setMsg} action={grid.play}         title="Play"      msg="Solving maze..."/>
+                <ActionButton setMsg={grid.setMsg} action={grid.play} title="Play" msg="Solving maze..."/>
             </div>
         );
     }
@@ -38,7 +38,7 @@ class ActionButton extends React.Component {
     };
     render() {
         return (
-            <button className="square" onClick={this.onClick}>
+            <button className="button" onClick={this.onClick}>
                 {this.title}
             </button>
         );
@@ -62,7 +62,7 @@ class StartButton extends ActionButton {
         this.props.setAction((event, field) => {
             console.log("place startpoint on ",field);
             this.startpoint.setPoint(field);
-            field.setContent(this.startpoint);
+            // field.setContent(this.startpoint);
         });
     };
 }
@@ -75,7 +75,7 @@ class EndButton extends ActionButton {
         this.props.setAction((event, field) => {
             console.log("place endpoint on ",field);
             this.endpoint.setPoint(field);
-            field.setContent(this.endpoint);
+            // field.setContent(this.endpoint);
         });
     };
 }
