@@ -28,14 +28,14 @@ export default class Grid extends React.Component {
     setAction = actionCallback => this.setState({actionCallback: actionCallback});
 
     clear = () => {
+        this.board.clearAll();
         this.setState({
             success: false,
             successPath: [],
             msg: "Board has been cleared"
         });
-        this.board.clearAll();
-        console.log("grid cleared");
     };
+
     play = () => {
         console.log("play");
 
@@ -49,6 +49,7 @@ export default class Grid extends React.Component {
                     successPath: result.pathTo,
                     success: true
                 });
+                console.log("Shortest path found: ",result.pathTo);
                 this.setMsg("Shortest path found! Distance: "+result.distanceTo);
             }
             else {
@@ -136,7 +137,11 @@ class Field extends React.Component {
         this.reset();
     }
     setContent(content) {
-        console.log("setContent");
+        console.log("set content: ",content);
+        if (this.state.content) {
+            console.log("remove old content: ",this.state.content);
+            this.board.unregister(this.state.content);
+        }
         this.setState({content: content});
     }
     getContent() {

@@ -38,14 +38,46 @@ export default class Board {
         this.board[x][y] = field;
     }
     get(x,y) {
-        console.log("get("+x+", "+y+")");
         return this.board[x][y];
     }
     clearAll() {
+        console.log("clearAll: ",this.obstacles.length);
+        for (let i=0; i<this.obstacles.length; i++) {
+            console.log("clearing for loop",this.obstacles[i]);
+            if (this.obstacles[i].field) {
+                this.obstacles[i].field.setContent(null);
+            }
+            else {
+                console.log("for missing field! ",this.obstacles[i]);
+            }
+        }
+        console.log("clear for!: ",this.obstacles);
         this.obstacles.forEach(obstacle => {
-            obstacle.field.setContent(null);
+            console.log("clearing ",obstacle);
+            if (obstacle.field) {
+                obstacle.field.setContent(null);
+            }
+            else {
+                console.log("missing field! ",obstacle);
+            }
         });
+        console.log("clear!: ",this.obstacles);
         this.init();
+    }
+    unregister(obstacle) {
+        if (obstacle instanceof StartPoint) {
+            this.startpoint = null;
+        }
+        if (obstacle instanceof EndPoint) {
+            this.endpoint = null;
+        }
+        if (obstacle instanceof WormholeEntrance) {
+            this.wormholeEntrances.splice(this.wormholeEntrances.indexOf(obstacle), 1);
+        }
+        if (obstacle instanceof WormholeExit) {
+            this.wormholeExits.splice(this.wormholeExits.indexOf(obstacle), 1);
+        }
+        this.obstacles.splice(this.obstacles.indexOf(obstacle), 1);
     }
     register(obstacle) {
         if (obstacle instanceof StartPoint) {
@@ -55,14 +87,13 @@ export default class Board {
             this.endpoint = obstacle;
         }
         if (obstacle instanceof WormholeEntrance) {
-            console.log("wormhole entrance");
             this.wormholeEntrances.push(obstacle);
         }
         if (obstacle instanceof WormholeExit) {
-            console.log("wormhole exit");
             this.wormholeExits.push(obstacle);
         }
-        this.obstacles.push(obstacle);
+        console.log("new length: ",this.obstacles.push(obstacle));
+        console.log("registered: ",this.obstacles);
     }
     static createBoard(width, height, grid) {
         if (!this.instance) {
@@ -98,7 +129,6 @@ class Obstacle {
 }
 class UniquePoint extends Obstacle {
     setPoint = field => {
-        console.log("old field: ",this.field);
         if (this.field) {
             this.field.setContent(null);
         }
@@ -126,9 +156,9 @@ export class Gravel extends Obstacle {
 }
 
 export class WormholeEntrance extends Obstacle {
-    label = "Win";
+    label = "W in";
 }
 
 export class WormholeExit extends Obstacle {
-    label = "Wexit";
+    label = "W exit";
 }

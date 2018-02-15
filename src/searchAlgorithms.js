@@ -42,11 +42,9 @@ export default class AStar {
         if (y>0) neighbours.push(this.board.get(x,y-1));
         if (x<this.width-1) neighbours.push(this.board.get(x+1,y));
         if (y<this.height-1) neighbours.push(this.board.get(x,y+1));
-        console.log("this.board.get(x,y).getContent(): ",this.board.get(x,y).getContent());
         if (this.board.get(x,y).getContent() instanceof WormholeEntrance) {
             this.board.wormholeExits.forEach(exit => neighbours.push(exit.field));
         }
-        console.log("neighbours: ",neighbours.map(x=>x.coords.toString()));
         return neighbours;
     };
 
@@ -57,13 +55,14 @@ export default class AStar {
 
         let closedSet = new Set();
         let openSet = [];
+
+        let infiniteLoopPrevention = this.width*this.height*2;
     
         startfield.setPath(0, this.manhattanDistance(startfield, endfield), []);
         openSet.push(startfield);
 
         let addNeighbour = neighbour => {
             if (!closedSet.has(neighbour)) {
-                // console.log("neighbour: ",neighbour);
                 let distanceTo = current.distanceTo+neighbour.stepTo();
                 if (distanceTo < neighbour.distanceTo) {
                     neighbour.setPath(
@@ -71,10 +70,8 @@ export default class AStar {
                         this.distanceEstimate(neighbour, endfield),
                         current.pathTo.concat(neighbour)
                     );
-                    console.log("n dist: ",this.distanceEstimate(neighbour, endfield));
                     openSet.push(neighbour);
                 }
-                console.log("neighbour ",neighbour.coords, neighbour.distanceTo);
             }
         };
 
@@ -82,16 +79,11 @@ export default class AStar {
         let current;
         do {
             current = openSet.pop();
-            console.log("current: ",current.coords, current.distanceTo);
             this.getNeighbours(current).forEach(addNeighbour);
     
             closedSet.add(current);
             openSet.sort((a, b) => (b.distanceTo+b.distanceFrom)-(a.distanceTo+a.distanceFrom));
-            console.log("openSet: ",openSet.map(x=>x.coords.toString()));
-            console.log("closedSet: ",[...closedSet].map(x=>x.coords.toString()));
-        } while (openSet.length > 0 && current!==endfield && current.distanceTo < 100);
-
-        console.log("current: ",current);
+        } while (openSet.length > 0 && current!==endfield && current.distanceTo < infiniteLoopPrevention);
 
         return current;
     }
