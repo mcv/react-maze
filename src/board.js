@@ -41,27 +41,11 @@ export default class Board {
         return this.board[x][y];
     }
     clearAll() {
-        console.log("clearAll: ",this.obstacles.length);
-        for (let i=0; i<this.obstacles.length; i++) {
-            console.log("clearing for loop",this.obstacles[i]);
-            if (this.obstacles[i].field) {
-                this.obstacles[i].field.setContent(null);
-            }
-            else {
-                console.log("for missing field! ",this.obstacles[i]);
-            }
-        }
-        console.log("clear for!: ",this.obstacles);
         this.obstacles.forEach(obstacle => {
-            console.log("clearing ",obstacle);
             if (obstacle.field) {
                 obstacle.field.setContent(null);
             }
-            else {
-                console.log("missing field! ",obstacle);
-            }
         });
-        console.log("clear!: ",this.obstacles);
         this.init();
     }
     unregister(obstacle) {
@@ -92,8 +76,6 @@ export default class Board {
         if (obstacle instanceof WormholeExit) {
             this.wormholeExits.push(obstacle);
         }
-        console.log("new length: ",this.obstacles.push(obstacle));
-        console.log("registered: ",this.obstacles);
     }
     static createBoard(width, height, grid) {
         if (!this.instance) {

@@ -137,9 +137,7 @@ class Field extends React.Component {
         this.reset();
     }
     setContent(content) {
-        console.log("set content: ",content);
         if (this.state.content) {
-            console.log("remove old content: ",this.state.content);
             this.board.unregister(this.state.content);
         }
         this.setState({content: content});
