@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import Grid from './grid.js';
-import './searchAlgorythms.js';
 
 class Game extends React.Component {
     render() {

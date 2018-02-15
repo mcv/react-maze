@@ -1,8 +1,18 @@
 export class ObstacleRegistry {
     constructor() {
+        this.init();
+    }
+    init() {
         this.obstacles = [];
         this.wormholeEntrances = [];
         this.wormholeExits = [];
+        // this.coordMap = new Map();
+    }
+    clearAll() {
+        this.obstacles.forEach(obstacle => {
+            obstacle.field.content = null;
+        });
+        this.init();
     }
     register(obstacle) {
         if (obstacle instanceof WormholeEntrance) {
@@ -14,14 +24,7 @@ export class ObstacleRegistry {
             this.wormholeExits.push(obstacle);
         }
         this.obstacles.push(obstacle);
-    }
-    clearAll() {
-        this.obstacles.forEach(obstacle => {
-            obstacle.field.content = null;
-        });
-        this.obstacles = [];
-        this.wormholeEntrances = [];
-        this.wormholeExits = [];
+        // this.coordMap.set(obstacle.coords, obstacle);
     }
     static getRegistry() {
         if (!this.registry) {
@@ -44,6 +47,9 @@ class Obstacle {
         ObstacleRegistry.getRegistry().register(this);
     }
     stepTo = 1;
+    setNode(node) {
+        this.node = node;
+    }
 }
 class UniquePoint extends Obstacle {
     setPoint = field => {

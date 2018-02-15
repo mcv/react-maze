@@ -1,43 +1,25 @@
 import React from 'react';
 import ActionButtons from './actionButtons.js';
-import {StartPoint, EndPoint, WormholeEntrance, WormholeExit, ObstacleRegistry} from './obstacles.js'
-
-// class FieldRegistry {
-//     constructor() {
-//         this.obstacles = [];
-//         this.wormholeEntrances = [];
-//         this.wormholeExits = [];
-//     }
-//     register(field) {
-//         this.obstacles.push(obstacle);
-//     }
-//     static getRegistry() {
-//         if (!this.registry) {
-//             this.registry = new FieldRegistry();
-//         }
-//         return this.registry;
-//     }
-//
-// }
+import {StartPoint, EndPoint, WormholeEntrance, WormholeExit, Board} from './obstacles.js';
+import AStar from './searchAlgorithms.js';
 
 export default class Grid extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            x: 5,
-            y: 5,
+            width: 5,
+            height: 5,
             obstacles: [],
             msg: "",
             actionCallback: ()=>{}
         };
-        this.board = [];
         this.startpoint = new StartPoint();
         this.endpoint = new EndPoint();
     }
 
-    changeX = event => this.setState({x: event.target.value});
+    changeWidth = event => this.setState({width: event.target.value});
 
-    changeY = event => this.setState({y: event.target.value});
+    changeHeight = event => this.setState({height: event.target.value});
 
     setMsg = text => this.setState({msg: text});
 
@@ -49,58 +31,11 @@ export default class Grid extends React.Component {
     play = () => {
         console.log("play");
 
-        let board = this.board;
-        let startpoint = this.startpoint.field;
-        let endpoint = this.endpoint.field;
+        let searchAlgorithm = new AStar(this.state.width, this.state.height);
 
-        let manhattanDistance = (fieldA, fieldB) => Math.abs(fieldA.x-fieldB.x)+Math.abs(fieldA.y-fieldB.y);
+        let result = searchAlgorithm.search(this.startpoint, this.endpoint);
 
-        let getNeighbours = (field) => {
-            let neighbours = [];
-            let [x,y] = [field.x, field.y];
-            if (board[y][x-1]) neighbours.push(board[y][x-1]);
-            if (board[y-1][x]) neighbours.push(board[y-1][x]);
-            if (board[y][x+1]) neighbours.push(board[y][x+1]);
-            if (board[y+1][x]) neighbours.push(board[y+1][x]);
-            if (field.content instanceof WormholeEntrance) {
-                ObstacleRegistry.wormholeExits.forEach(exit => neighbours.push(exit.field));
-            }
-            console.log("neighbours: ",neighbours);
-            return neighbours;
-        };
-
-        // let pathTo = new Map();
-        // pathTo.set(this.startpoint, new Path(0, [this.startpoint]));
-
-        let closedSet = new Set();
-        let openSet = [];
-
-        startpoint.setPath(0, manhattanDistance(startpoint, endpoint), []);
-        openSet.push(startpoint);
-
-        let current;
-        do {
-            current = openSet.pop();
-            console.log("current: ",current);
-            getNeighbours(current).forEach(neighbour => {
-                if (!closedSet.has(neighbour) && openSet.indexOf(neighbour)!==-1) {
-                    let distanceTo = current.distanceTo+neighbour.stepTo();
-                    if (distanceTo < neighbour.distanceTo) {
-                        neighbour.setPath(
-                            distanceTo,
-                            manhattanDistance(neighbour, endpoint),
-                            current.pathTo.concat(neighbour)
-                        );
-                        openSet.push(neighbour);
-                    }
-                }
-            });
-
-            openSet.sort((a, b) => (b.distanceTo+b.distanceFrom)-(a.distanceTo+a.distanceFrom));
-        } while (openSet.length > 0 && current!==endpoint);
-
-
-        if (current === endpoint) {
+        if (result === this.endpoint) {
 //            this.displayPath(endpoint);
             this.setMsg("Shortest path found!");
         }
@@ -108,39 +43,28 @@ export default class Grid extends React.Component {
             this.setMsg("No path can be found");
         }
 
-        // // Manhattan distance
-        //
-        // let findPath = (field, path, distance) => {
-        //     if (!visited.has(field)) {
-        //         visited.add(field);
-        //
-        //         neighbours.forEach(neighbour)
-        //     }
-        // }
-        //
-        // let solution = findPath(this.startpoint, [], 0);
+
     };
 
     render() {
         const status = 'Next player: X';
 
         let rows = [];
-        this.board = [];
-        for (var y=0; y<this.state.y; y++) {
+        for (var y=0; y<this.state.height; y++) {
             let fields = [];
-            for (let x=0; x<this.state.x; x++) {
+            for (let x=0; x<this.state.width; x++) {
                 fields.push(<Field key={x.toString()+'-'+y.toString()} coords={[x,y]} action={this.state.actionCallback}/>)
             }
             rows.push(<div key={y} className="board-row">{fields}</div>);
-            // rows.push(<Row key={y} y={y} columnsAmount={this.state.x} action={this.state.actionCallback}/>);
+            // rows.push(<Row key={y} y={y} columnsAmount={this.state.xwidth} action={this.state.actionCallback}/>);
         }
 
         return (
             <div>
                 <div className="status">{status}</div>
                 <div>
-                    <label>X: </label><input id="x" type="number" value={this.state.x} onChange={this.changeX}/>
-                    <label>Y: </label><input id="y" type="number" value={this.state.y} onChange={this.changeY}/>
+                    <label>Width: </label><input id="width" type="number" value={this.state.width} onChange={this.changeWidth}/>
+                    <label>Height: </label><input id="height" type="number" value={this.state.height} onChange={this.changeHeight}/>
                 </div>
                 <div className="board-row">
                     <ActionButtons grid={this}/>
@@ -175,20 +99,6 @@ class Field extends React.Component {
         this.state = {
             content: null
         };
-        this.reset();
-    }
-    reset() {
-        this.distanceTo = Infinity;
-        this.distanceFrom = Infinity;
-        this.pathTo = [];
-    }
-    setPath(distanceTo, distanceFrom, pathTo) {
-        this.distanceTo = distanceTo;
-        this.distanceFrom = distanceFrom;
-        this.pathTo = pathTo;
-    }
-    stepTo() {
-        return this.content? this.content.stepTo : 1;
     }
     setContent(content) {
         this.setState({content: content});
