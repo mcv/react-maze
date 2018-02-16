@@ -14,7 +14,7 @@ export default class Board {
         this.endpoint = new EndPoint();
     }
     ready() {
-        return this.startpoint && this.endpoint;
+        return this.startpoint.field && this.endpoint.field;
     }
     resize() {
         let board = [];
@@ -41,14 +41,20 @@ export default class Board {
         return this.board[x][y];
     }
     clearAll() {
-        this.obstacles.forEach(obstacle => {
-            if (obstacle.field) {
-                obstacle.field.setContent(null);
-            }
-        });
+        for(let x = 0; x<this.width; x++)
+        for(let y = 0; y<this.height; y++) {
+            this.board[x][y].setContent(null);
+        }
+        // this.obstacles.forEach((obstacle, index, array) => {
+        //     console.log("removing "+index, obstacle, array);
+        //     if (obstacle.field) {
+        //         obstacle.field.setContent(null);
+        //     }
+        // });
         this.init();
     }
     unregister(obstacle) {
+        console.log("unregister ",obstacle);
         if (obstacle instanceof StartPoint) {
             this.startpoint = null;
         }
@@ -64,6 +70,7 @@ export default class Board {
         this.obstacles.splice(this.obstacles.indexOf(obstacle), 1);
     }
     register(obstacle) {
+        console.log("register: ",obstacle);
         if (obstacle instanceof StartPoint) {
             this.startpoint = obstacle;
         }
@@ -76,6 +83,7 @@ export default class Board {
         if (obstacle instanceof WormholeExit) {
             this.wormholeExits.push(obstacle);
         }
+        this.obstacles.push(obstacle);
     }
     static createBoard(width, height, grid) {
         if (!this.instance) {

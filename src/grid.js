@@ -28,6 +28,7 @@ export default class Grid extends React.Component {
     setAction = actionCallback => this.setState({actionCallback: actionCallback});
 
     clear = () => {
+        console.log("clear board: ",this.board.obstacles);
         this.board.clearAll();
         this.setState({
             success: false,
