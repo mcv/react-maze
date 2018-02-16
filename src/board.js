@@ -1,9 +1,9 @@
 export default class Board {
-    constructor(width, height, grid) {
+    constructor(width, height, game) {
         this.width = width;
         this.height = height;
         this.board = [];
-        this.grid = grid
+        this.game = game
         this.resize();
     }
     init() {
@@ -54,7 +54,6 @@ export default class Board {
         this.init();
     }
     unregister(obstacle) {
-        console.log("unregister ",obstacle);
         if (obstacle instanceof StartPoint) {
             this.startpoint = null;
         }
@@ -70,7 +69,6 @@ export default class Board {
         this.obstacles.splice(this.obstacles.indexOf(obstacle), 1);
     }
     register(obstacle) {
-        console.log("register: ",obstacle);
         if (obstacle instanceof StartPoint) {
             this.startpoint = obstacle;
         }
@@ -85,13 +83,13 @@ export default class Board {
         }
         this.obstacles.push(obstacle);
     }
-    static createBoard(width, height, grid) {
+    static createBoard(width, height, game) {
         if (!this.instance) {
-            this.instance = new Board(width, height, grid);
+            this.instance = new Board(width, height, game);
         }
         else {
             this.instance.setSize(width, height);
-            this.grid = grid;
+            this.game = game;
         }
         return this.instance;
     }

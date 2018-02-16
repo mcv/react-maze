@@ -3,7 +3,7 @@ import ActionButtons from './actionButtons.js';
 import Board from './board.js';
 import AStar from './searchAlgorithms.js';
 
-export default class Grid extends React.Component {
+export default class Game extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -76,7 +76,7 @@ export default class Grid extends React.Component {
                     <label>Height: </label><input id="height" type="number" value={this.state.height} onChange={this.changeHeight}/>
                 </div>
                 <div className="board-row">
-                    <ActionButtons grid={this}/>
+                    <ActionButtons game={this}/>
                 </div>
                 <div className="message">{this.state.msg}</div>
                 {this.renderBoard()}
