@@ -93,7 +93,6 @@ export default class Game extends React.Component {
         this.state.successPath.forEach(field => {
             pathString += 'L'+drawPoint(field);
         });
-        //+f.x+','+f.y+'L'+(f.x-5)+','+f.y+',L'+f.x+','+(f.y+10)+'L'+(f.x+5)+','+f.y+'Z'
         return <path d={pathString} stroke="red" fill="none"></path>
     }
 
@@ -103,7 +102,6 @@ export default class Game extends React.Component {
         let height = this.state.height;
         let scale = this.state.scale;
 
-        // let rows = [];
         let fields = [];
         for (var y=0; y<height; y++) {
             for (let x=0; x<width; x++) {
@@ -111,7 +109,6 @@ export default class Game extends React.Component {
                                    board={this.board}
                                    action={this.state.actionCallback} scale={scale}/>)
             }
-            // rows.push(<div key={y} className="board-row">{fields}</div>);
         }
         let successPath = '';
         if (this.state.success) {
